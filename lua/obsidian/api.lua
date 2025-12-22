@@ -727,8 +727,12 @@ end
 
 M.float_win = function()
   local buf = vim.api.nvim_get_current_buf()
-  local width = vim.api.nvim_get_option_value "columns"
-  local height = vim.api.nvim_get_option_value "lines"
+  local width = vim.api.nvim_get_option_value("columns", {
+    buf = buf,
+  })
+  local height = vim.api.nvim_get_option_value("lines", {
+    buf = buf,
+  })
 
   local win_width = math.floor(width * 0.8)
   local win_height = math.floor(height * 0.8)
