@@ -256,6 +256,11 @@ M.open_note = function(entry, cmd)
   end
   cmd = vim.trim(cmd and cmd or "e")
 
+  if cmd == "float" then
+    vim.cmd(string.format("%s %s", "e", vim.fn.fnameescape(tostring(path))))
+    M.float_win()
+    return vim.api.nvim_get_current_buf()
+  end
   ---@type integer|?
   local result_bufnr
 
@@ -430,6 +435,8 @@ M.get_open_strategy = function(opt)
     return "vsplit "
   elseif vim.startswith(OpenStrategy.hsplit_force, opt) then
     return "hsplit "
+  elseif vim.startswith(OpenStrategy.float, opt) then
+    return "float"
   elseif vim.startswith(OpenStrategy.current, opt) then
     return "e "
   else
@@ -718,6 +725,29 @@ M.smart_action = function()
   end
 end
 
+M.float_win = function()
+  local buf = vim.api.nvim_get_current_buf()
+  local width = vim.api.nvim_get_option_value "columns"
+  local height = vim.api.nvim_get_option_value "lines"
+
+  local win_width = math.floor(width * 0.8)
+  local win_height = math.floor(height * 0.8)
+
+  local row = math.floor((height - win_height) / 2)
+  local col = math.floor((width - win_width) / 2)
+
+  local opts = {
+    relative = "editor",
+    width = win_width,
+    height = win_height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  }
+
+  vim.api.nvim_open_win(buf, true, opts)
+end
 ---Check if we are in node that should not do checkbox operations.
 ---
 ---@return boolean
