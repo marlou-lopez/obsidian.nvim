@@ -143,12 +143,14 @@ return {
   ---@field template? string
   ---@field default_tags? string[]
   ---@field workdays_only? boolean
+  ---@field open_notes_in? string
   daily_notes = {
     folder = nil,
     date_format = nil,
     alias_format = nil,
     default_tags = { "daily-notes" },
     workdays_only = true,
+    open_notes_in = "float",
   },
 
   ---@class obsidian.config.UICharSpec
