@@ -1131,7 +1131,9 @@ Note.open = function(self, opts)
       lnum = opts.line,
       col = opts.col,
     }, open_cmd)
-    vim.b[bufnr].note = self
+    if open_cmd ~= "float" then
+      vim.b[bufnr].note = self
+    end
     if opts.callback then
       opts.callback(bufnr)
     end
