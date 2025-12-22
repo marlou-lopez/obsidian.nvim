@@ -257,9 +257,10 @@ M.open_note = function(entry, cmd)
   cmd = vim.trim(cmd and cmd or "e")
 
   if cmd == "float" then
-    vim.cmd(string.format("%s %s", "e", vim.fn.fnameescape(tostring(path))))
-    M.float_win()
-    return vim.api.nvim_get_current_buf()
+    local bufnr = vim.fn.bufadd(tostring(path))
+    vim.fn.bufload(bufnr)
+    M.float_win(bufnr)
+    return bufnr
   end
   ---@type integer|?
   local result_bufnr
@@ -725,8 +726,7 @@ M.smart_action = function()
   end
 end
 
-M.float_win = function()
-  local buf = vim.api.nvim_get_current_buf()
+M.float_win = function(buf)
   local width = vim.api.nvim_get_option_value("columns", {})
   local height = vim.api.nvim_get_option_value("lines", {})
 

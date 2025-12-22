@@ -106,4 +106,43 @@ T["cursor_heading"] = function()
   eq(vim.NIL, child.lua [[return M.cursor_heading()]])
 end
 
+T["open_note"] = new_set()
+
+T["open_note"]["should not change buffer in current window when opening in float"] = function()
+  -- initial windows
+  local initial_wins = child.api.nvim_list_wins()
+  eq(1, #initial_wins)
+  local orig_win_id = initial_wins[1]
+
+  -- Get current buffer
+  local orig_bufnr = child.api.nvim_win_get_buf(orig_win_id)
+
+  -- Create a dummy file in the vault
+  local note_path = child.Obsidian.dir / "my-new-note.md"
+  h.write("hello world", note_path)
+
+  -- Open note in floating window
+  child.lua(string.format([[M.open_note("%s", "float")]], tostring(note_path)))
+
+  -- Check that buffer in original window hasn't changed
+  local new_bufnr_in_orig_win = child.api.nvim_win_get_buf(orig_win_id)
+  eq(orig_bufnr, new_bufnr_in_orig_win)
+
+  -- Check that a new window was opened
+  local final_wins = child.api.nvim_list_wins()
+  eq(2, #final_wins)
+
+  -- And that the new window is a float
+  local new_win_id
+  for _, win_id in ipairs(final_wins) do
+    if win_id ~= orig_win_id then
+      new_win_id = win_id
+      break
+    end
+  end
+
+  local win_config = child.api.nvim_win_get_config(new_win_id)
+  eq("editor", win_config.relative)
+end
+
 return T
