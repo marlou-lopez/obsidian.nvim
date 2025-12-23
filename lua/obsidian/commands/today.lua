@@ -17,6 +17,6 @@ return function(data)
   local note = require("obsidian.daily").daily(offset_days, {})
 
   note:open {
-    open_strategy = options.daily_notes.open_notes_in or "float",
+    open_strategy = options.daily_notes.open_notes_in or options.open_notes_in or "float",
   }
 end

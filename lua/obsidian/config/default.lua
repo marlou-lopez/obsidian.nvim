@@ -143,7 +143,7 @@ return {
   ---@field template? string
   ---@field default_tags? string[]
   ---@field workdays_only? boolean
-  ---@field open_notes_in? string
+  ---@field open_notes_in? obsidian.config.OpenStrategy
   daily_notes = {
     folder = nil,
     date_format = nil,

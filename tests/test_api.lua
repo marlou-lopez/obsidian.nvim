@@ -145,4 +145,35 @@ T["open_note"]["should not change buffer in current window when opening in float
   eq("editor", win_config.relative)
 end
 
+T["open_note"]["should focus existing float window instead of creating a new one"] = function()
+  local orig_win_id = child.api.nvim_get_current_win()
+
+  -- Create a dummy file in the vault
+  local note_path = child.Obsidian.dir / "my-new-note.md"
+  h.write("hello world", note_path)
+
+  -- Open note in floating window
+  child.lua(string.format([[M.open_note("%s", "float")]], tostring(note_path)))
+
+  -- Check that a new window was opened
+  local wins_after_first_open = child.api.nvim_list_wins()
+  eq(2, #wins_after_first_open)
+  local float_win_id = child.api.nvim_get_current_win() -- it should be focused
+
+  -- go back to original window to lose focus on the float
+  child.api.nvim_set_current_win(orig_win_id)
+  eq(orig_win_id, child.api.nvim_get_current_win()) -- make sure focus changed
+
+  -- Open note in floating window AGAIN
+  child.lua(string.format([[M.open_note("%s", "float")]], tostring(note_path)))
+
+  -- Check that NO new window was opened
+  local wins_after_second_open = child.api.nvim_list_wins()
+  eq(2, #wins_after_second_open)
+
+  -- Check that the previously created float window is now the current one
+  local final_current_win = child.api.nvim_get_current_win()
+  eq(float_win_id, final_current_win)
+end
+
 return T

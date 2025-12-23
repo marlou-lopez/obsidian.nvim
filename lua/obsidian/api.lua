@@ -259,6 +259,21 @@ M.open_note = function(entry, cmd)
   if cmd == "float" then
     local bufnr = vim.fn.bufadd(tostring(path))
     vim.fn.bufload(bufnr)
+
+    -- Find existing windows for this buffer
+    for _, winid in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_get_buf(winid) == bufnr then
+        -- This buffer is already in a window. Is it a float?
+        local config = vim.api.nvim_win_get_config(winid)
+        if config.relative and config.relative ~= "" then
+          -- It's a float. Focus it.
+          vim.api.nvim_set_current_win(winid)
+          return bufnr
+        end
+      end
+    end
+
+    -- If we get here, the buffer is not in a floating window.
     M.float_win(bufnr)
     return bufnr
   end
