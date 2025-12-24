@@ -264,8 +264,8 @@ M.open_note = function(entry, cmd)
     for _, winid in ipairs(vim.api.nvim_list_wins()) do
       if vim.api.nvim_win_get_buf(winid) == bufnr then
         -- This buffer is already in a window. Is it a float?
-        local config = vim.api.nvim_win_get_config(winid)
-        if config.relative and config.relative ~= "" then
+        local winconf = vim.api.nvim_win_get_config(winid)
+        if winconf.relative and winconf.relative ~= "" then
           -- It's a float. Focus it.
           vim.api.nvim_set_current_win(winid)
           return bufnr
