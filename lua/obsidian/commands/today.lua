@@ -2,6 +2,7 @@ local log = require "obsidian.log"
 
 ---@param data obsidian.CommandArgs
 return function(data)
+  local options = Obsidian.opts
   local offset_days = 0
   local arg = string.gsub(data.args, " ", "")
   if string.len(arg) > 0 then
@@ -14,5 +15,8 @@ return function(data)
     end
   end
   local note = require("obsidian.daily").daily(offset_days, {})
-  note:open()
+
+  note:open {
+    open_strategy = options.daily_notes.open_notes_in or options.open_notes_in or "float",
+  }
 end

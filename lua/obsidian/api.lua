@@ -254,6 +254,27 @@ M.open_note = function(entry, cmd)
   end
   cmd = vim.trim(cmd and cmd or "e")
 
+  if cmd == "float" then
+    local bufnr = vim.fn.bufadd(tostring(path))
+    vim.fn.bufload(bufnr)
+
+    -- Find existing windows for this buffer
+    for _, winid in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_get_buf(winid) == bufnr then
+        -- This buffer is already in a window. Is it a float?
+        local winconf = vim.api.nvim_win_get_config(winid)
+        if winconf.relative and winconf.relative ~= "" then
+          -- It's a float. Focus it.
+          vim.api.nvim_set_current_win(winid)
+          return bufnr
+        end
+      end
+    end
+
+    -- If we get here, the buffer is not in a floating window.
+    M.float_win(bufnr)
+    return bufnr
+  end
   ---@type integer|?
   local result_bufnr
 
@@ -428,6 +449,8 @@ M.get_open_strategy = function(opt)
     return "vsplit "
   elseif vim.startswith(OpenStrategy.hsplit_force, opt) then
     return "hsplit "
+  elseif vim.startswith(OpenStrategy.float, opt) then
+    return "float"
   elseif vim.startswith(OpenStrategy.current, opt) then
     return "e "
   else
@@ -716,6 +739,28 @@ M.smart_action = function()
   end
 end
 
+M.float_win = function(buf)
+  local width = vim.api.nvim_get_option_value("columns", {})
+  local height = vim.api.nvim_get_option_value("lines", {})
+
+  local win_width = math.floor(width * 0.8)
+  local win_height = math.floor(height * 0.8)
+
+  local row = math.floor((height - win_height) / 2)
+  local col = math.floor((width - win_width) / 2)
+
+  local opts = {
+    relative = "editor",
+    width = win_width,
+    height = win_height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  }
+
+  vim.api.nvim_open_win(buf, true, opts)
+end
 ---Check if we are in node that should not do checkbox operations.
 ---
 ---@return boolean
