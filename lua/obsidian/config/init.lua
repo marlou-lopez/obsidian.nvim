@@ -10,6 +10,7 @@ config.OpenStrategy = {
   hsplit = "hsplit",
   vsplit_force = "vsplit_force",
   hsplit_force = "hsplit_force",
+  float = "float",
 }
 
 ---@enum obsidian.config.SortBy
